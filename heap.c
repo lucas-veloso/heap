@@ -119,7 +119,7 @@ bool heap_encolar(heap_t *heap, void *elem);
 
 void *heap_ver_max(const heap_t *heap){
 	if (heap_esta_vacio(heap)) return NULL;
-	return heap->datos[heap->cantidad-1];
+	return heap->datos[0];
 }
 
 /* Elimina el elemento con máxima prioridad, y lo devuelve.
