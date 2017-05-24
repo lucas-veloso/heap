@@ -34,32 +34,32 @@ void swap (void** dato1, void** dato2){
 	return;
 }
 
-void upheap (void *arreglo[], size_t pos){
+void upheap (void *arreglo[], size_t pos, cmp_func_t comparar){
 	if (pos == 0) return;
 	size_t padre = (pos-1)/2;
-	if (arreglo[padre] < arreglo [pos]){
+	if (comparar(arreglo[padre],arreglo [pos])<0){
 		swap(&arreglo[padre],&arreglo[pos]);
-		upheap(arreglo,padre);
+		upheap(arreglo,padre,comparar);
 	}
 }
 
-void downheap (void *arreglo[], size_t n, size_t pos){
+void downheap (void *arreglo[], size_t n, size_t pos, cmp_func_t comparar){
 	if (pos>=n) return;
 	size_t max = pos;
 	size_t hijo_izq = (2*pos) +1;
 	size_t hijo_der = (2*pos) +2;
-	if (hijo_izq <n && arreglo[hijo_izq] > arreglo[max]) max = hijo_izq;
-	if (hijo_der <n && arreglo[hijo_der] > arreglo[max]) max = hijo_der;
+	if (hijo_izq <n && comparar(arreglo[hijo_izq],arreglo[max])>0) max = hijo_izq;
+	if (hijo_der <n && comparar(arreglo[hijo_der],arreglo[max])>0) max = hijo_der;
 	if (max!= pos){
 		swap(&arreglo[max],&arreglo[pos]);
-		downheap(arreglo,n,max);
+		downheap(arreglo,n,max,comparar);
 	}
 }
 
 void heapify(heap_t* heap){
 	size_t pos = heap->cantidad-1;
 	while (pos != 0){
-		downheap(heap->datos,heap->cantidad,pos);
+		downheap(heap->datos,heap->cantidad,pos,heap->comparar);
 		pos--;
 	}
 }
@@ -95,11 +95,13 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 	return heap;                                                                                                                                  
 }
 
-/* Elimina el heap, llamando a la función dada para cada elemento del mismo.
- * El puntero a la función puede ser NULL, en cuyo caso no se llamará.
- * Post: se llamó a la función indicada con cada elemento del heap. El heap
- * dejó de ser válido. */
-void heap_destruir(heap_t *heap, void destruir_elemento(void *e));
+void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
+	for (int i=0; i<heap->tamanio; i++){
+		if (destruir_elemento) destruir_elemento(heap->datos[i]);
+		free(heap->datos[i]);
+	}
+	free(heap);
+}
 
 size_t heap_cantidad(const heap_t *heap){
 	return heap->cantidad;
@@ -110,21 +112,16 @@ bool heap_esta_vacio(const heap_t *heap){
 	return false;
 }
 
-/* Agrega un elemento al heap. El elemento no puede ser NULL.
- * Devuelve true si fue una operación exitosa, o false en caso de error.
- * Pre: el heap fue creado.
- * Post: se agregó un nuevo elemento al heap.
- */
-bool heap_encolar(heap_t *heap, void *elem);
+bool heap_encolar(heap_t *heap, void *elem){
+	if (elem == NULL || !heap) return false;
+	return true;
+}
 
 void *heap_ver_max(const heap_t *heap){
 	if (heap_esta_vacio(heap)) return NULL;
 	return heap->datos[0];
 }
 
-/* Elimina el elemento con máxima prioridad, y lo devuelve.
- * Si el heap esta vacío, devuelve NULL.
- * Pre: el heap fue creado.
- * Post: el elemento desencolado ya no se encuentra en el heap.
- */
-void *heap_desencolar(heap_t *heap);
+void *heap_desencolar(heap_t *heap){
+	if (heap_esta_vacio(heap) || !heap) return NULL;
+}
