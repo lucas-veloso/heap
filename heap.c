@@ -37,30 +37,28 @@ void swap (void** dato1, void** dato2){
 void upheap (void *arreglo[], size_t pos, cmp_func_t comparar){
 	if (pos == 0) return;
 	size_t padre = (pos-1)/2;
-	if (comparar(arreglo[padre],arreglo [pos])<0){
+	if (comparar(arreglo[padre],arreglo[pos])<0){
 		swap(&arreglo[padre],&arreglo[pos]);
 		upheap(arreglo,padre,comparar);
 	}
 }
 
-void downheap (void *arreglo[], size_t n, size_t pos, cmp_func_t comparar){
-	if (pos>=n) return;
+void downheap (void *arreglo[], size_t cantidad, size_t pos, cmp_func_t comparar){
+	if (pos>=cantidad) return;
 	size_t max = pos;
 	size_t hijo_izq = (2*pos) +1;
 	size_t hijo_der = (2*pos) +2;
-	if (hijo_izq <n && comparar(arreglo[hijo_izq],arreglo[max])>0) max = hijo_izq;
-	if (hijo_der <n && comparar(arreglo[hijo_der],arreglo[max])>0) max = hijo_der;
+	if (hijo_izq <cantidad && comparar(arreglo[hijo_izq],arreglo[max])>0) max = hijo_izq;
+	if (hijo_der <cantidad && comparar(arreglo[hijo_der],arreglo[max])>0) max = hijo_der;
 	if (max!= pos){
 		swap(&arreglo[max],&arreglo[pos]);
-		downheap(arreglo,n,max,comparar);
+		downheap(arreglo,cantidad,max,comparar);
 	}
 }
 
 void heapify(heap_t* heap){
-	size_t pos = heap->cantidad-1;
-	while (pos != 0){
-		downheap(heap->datos,heap->cantidad,pos,heap->comparar);
-		pos--;
+	for (int i = (heap->cantidad/2)-1; i>=0; i--){
+		downheap(heap->datos,heap->cantidad,i,heap->comparar);
 	}
 }
 
@@ -96,10 +94,10 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 }
 
 void heap_destruir(heap_t *heap, void destruir_elemento(void *e)){
-	for (int i=0; i<heap->tamanio; i++){
-		if (destruir_elemento) destruir_elemento(heap->datos[i]);
-		free(heap->datos[i]);
+	for (int i=0; i<heap->cantidad; i++){
+		if (destruir_elemento && (heap->datos[i]!=NULL)) destruir_elemento(heap->datos[i]);
 	}
+	free(heap->datos);
 	free(heap);
 }
 
@@ -114,6 +112,10 @@ bool heap_esta_vacio(const heap_t *heap){
 
 bool heap_encolar(heap_t *heap, void *elem){
 	if (elem == NULL || !heap) return false;
+	if (heap->cantidad >= (heap->tamanio * 0.7)) heap_redimensionar(heap,heap->tamanio *2);
+	heap->datos[heap->cantidad] = elem;
+	upheap(heap->datos,heap->cantidad,heap->comparar);
+	heap->cantidad++;
 	return true;
 }
 
@@ -124,4 +126,10 @@ void *heap_ver_max(const heap_t *heap){
 
 void *heap_desencolar(heap_t *heap){
 	if (heap_esta_vacio(heap) || !heap) return NULL;
+	void* max = heap->datos[0];
+	heap->datos[0] = heap->datos[heap->cantidad -1];
+	heap->datos[heap->cantidad-1] = NULL;
+	heap->cantidad--;
+	downheap(heap->datos,heap->cantidad,0,heap->comparar);
+	return max;
 }
