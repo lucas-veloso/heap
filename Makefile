@@ -1,4 +1,4 @@
-EXEC = abb
+EXEC = heap
 CC = gcc
 CFLAGS = -g -std=c99 -Wall -Wconversion -Wno-sign-conversion -Werror 
 
@@ -10,4 +10,4 @@ clean:
 
 run: all
 
-	valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 ./abb
+	valgrind --leak-check=full --track-origins=yes --show-reachable=yes --error-exitcode=2 ./heap
