@@ -56,9 +56,9 @@ void downheap (void *arreglo[], size_t cantidad, size_t pos, cmp_func_t comparar
 	}
 }
 
-void heapify(heap_t* heap){
-	for (int i = (heap->cantidad/2)-1; i>=0; i--){
-		downheap(heap->datos,heap->cantidad,i,heap->comparar);
+void heapify(/*heap_t* heap*/void *arreglo[], size_t cantidad, cmp_func_t comparar){
+	for (int i = cantidad/*(heap->cantidad/2)-1*/; i>=0; i--){
+		downheap(arreglo,cantidad,i,comparar);
 	}
 }
 
@@ -89,7 +89,7 @@ heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp){
 		heap->datos[i] = arreglo [i];
 		heap->cantidad++;
 	}
-	heapify(heap); 
+	heapify(heap->datos,heap->cantidad,heap->comparar); 
 	return heap;                                                                                                                                  
 }
 
@@ -132,4 +132,22 @@ void *heap_desencolar(heap_t *heap){
 	heap->cantidad--;
 	downheap(heap->datos,heap->cantidad,0,heap->comparar);
 	return max;
+}
+
+/* *****************************************************************
+ *                    		HEAP SORT                              *
+ * *****************************************************************/
+
+/* Función de heapsort genérica. Esta función ordena mediante heap_sort
+ * un arreglo de punteros opacos, para lo cual requiere que se
+ * le pase una función de comparación. Modifica el arreglo "in-place".
+ * Nótese que esta función NO es formalmente parte del TAD Heap.
+ */
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp){
+	heapify(elementos,cant,cmp);
+	while (cant > 0){
+		cant--;
+		swap(&elementos[0],&elementos[cant]);
+		downheap(elementos,cant,0,cmp);
+	}
 }
