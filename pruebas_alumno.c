@@ -97,8 +97,31 @@ static void pruebas_crear_arr_heapify(){
 	print_test("Heap destruido correctamente",true);
 }
 
+static void pruebas_heap_sort(){
+	void** elementos = malloc (sizeof(void*) * 10);
+	char* datos[]= {"7","2","1","8","7","9","5","6","2","4"};
+	int cantidad = 10;
+	for (int i = 0; i<cantidad; i++ ){
+		elementos[i]= datos[i];
+	} 
+	heap_sort(elementos,cantidad,cmp);
+
+	bool ok = true;
+	for (int i = 0; i<cantidad; i++){
+		for (int j=i; j<cantidad; j++){
+			if (strcmp((char*) elementos[i], (char*) elementos[j]) >0)
+				ok = false;
+		}
+		//printf("%s\n", (char*) elementos[i]);
+	}
+	print_test("El arreglo esta ordenado",ok);
+
+	free(elementos);
+}
+
 void pruebas_heap_alumno (){
 	pruebas_crear_heap_vacio();
 	pruebas_heap_encolar_desencolar();
 	pruebas_crear_arr_heapify();
+	pruebas_heap_sort();
 }
